@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>India Holidays Calendar 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .calendar {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+    }
+    .calendar header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .calendar table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .calendar th, .calendar td {
+      width: 14.285%; /* 7 days */
+      height: 80px;
+      text-align: right;
+      vertical-align: top;
+      padding: 5px;
+      border: 1px solid #ddd;
+      position: relative;
+    }
+    .calendar td.holiday {
+      background: #ffefef;
+      color: #d00;
+    }
+    .calendar td.today {
+      border: 2px solid #007bff;
+    }
+    .holiday-list {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .holiday-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .holiday-list li {
+      padding: 5px 0;
+    }
+    .status {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="status" id="status"></div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <div class="holiday-list">
+    <h3>Holidays in 2025 (India – sample list)</h3>
+    <ul id="holidayList"></ul>
+  </div>
+
+  <script>
+    // Sample holiday data – date strings in YYYY-MM-DD
+    const holidays = {
+      "2025-01-14": "Makar Sankranti / Pongal",
+      "2025-01-26": "Republic Day",
+      "2025-02-26": "Maha Shivaratri",
+      "2025-03-14": "Holi",
+      "2025-03-31": "Id-ul-Fitr (Ramzan)",
+      "2025-04-10": "Mahavir Jayanti",
+      "2025-04-18": "Good Friday",
+      "2025-05-12": "Buddha Purnima",
+      "2025-06-07": "Id-ul-Zuha (Bakrid)",
+      "2025-08-15": "Independence Day",
+      "2025-10-02": "Gandhi Jayanti",
+      "2025-10-20": "Diwali",
+      "2025-12-25": "Christmas Day"
+    };
+
+    function renderCalendar(year, month) {
+      const calendarEl = document.getElementById("calendar");
+      calendarEl.innerHTML = ""; // clear
+
+      const header = document.createElement("header");
+      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      header.innerHTML = `<h2>${monthNames[month]} ${year}</h2>`;
+      calendarEl.appendChild(header);
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
+        const th = document.createElement("th");
+        th.textContent = d;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month+1, 0).getDate();
+
+      let row = document.createElement("tr");
+      // empty cells for days before month start
+      for (let i = 0; i < firstDay; i++) {
+        const td = document.createElement("td");
+        row.appendChild(td);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        if ((row.children.length) === 7) {
+          tbody.appendChild(row);
+          row = document.createElement("tr");
+        }
+        const td = document.createElement("td");
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        td.textContent = day;
+
+        if (holidays[dateStr]) {
+          td.classList.add("holiday");
+          td.title = holidays[dateStr];
+        }
+
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+        if (dateStr === todayStr) {
+          td.classList.add("today");
+        }
+
+        row.appendChild(td);
+      }
+
+      // fill trailing empty cells
+      while (row.children.length < 7) {
+        const td = document.createElement("td");
+        row.appendChild(td);
+      }
+      tbody.appendChild(row);
+      table.appendChild(tbody);
+      calendarEl.appendChild(table);
+    }
+
+    function showTodayStatus() {
+      const statusEl = document.getElementById("status");
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+      if (holidays[todayStr]) {
+        statusEl.textContent = `🎉 Today (${todayStr}) is a holiday: ${holidays[todayStr]}`;
+      } else {
+        statusEl.textContent = `Today (${todayStr}) is not a holiday.`;
+      }
+    }
+
+    function listHolidays() {
+      const listEl = document.getElementById("holidayList");
+      const entries = Object.entries(holidays);
+      entries.sort((a,b) => a[0].localeCompare(b[0]));
+      entries.forEach(([date, reason]) => {
+        const li = document.createElement("li");
+        li.textContent = `${date} — ${reason}`;
+        listEl.appendChild(li);
+      });
+    }
+
+    // On load
+    const now = new Date();
+    renderCalendar(now.getFullYear(), now.getMonth());
+    showTodayStatus();
+    listHolidays();
+  </script>
+</body>
+</html>
